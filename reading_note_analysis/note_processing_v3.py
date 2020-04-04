@@ -340,7 +340,7 @@ if __name__ == "__main__":
         msg="选择聊天记录的来源", title="IOS or Android", choices=("IOS", "Android")
     )
     datePattern = easygui.choicebox(
-        msg="正则表达式的日期形式",
+        msg="日期形式的正则表达式",
         title="Regular Expression Pattern",
         choices=(pattern1, pattern2, pattern3),
     )
