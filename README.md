@@ -13,3 +13,7 @@ Automation tools for some tedious work in Xiaohuoban Association.
 3. email_bot
 
 批量发送带有图片附件的邮件。含有GUI，直接运行即可。
+
+4. xuetang_comment_spider
+
+爬取学堂在线慕课评论区的评论并按照发言者分类保存。
