@@ -14,9 +14,8 @@ logging.basicConfig(
     datefmt="%H:%M:%S",
 )
 
-INDEX_URL = "https://next.xuetangx.com/api/v1/lms/forum/comment/list/879714/?offset={offset}&limit={limit}"
-COOKIE = r"_ga=GA1.2.1586304578.1588410875; _gid=GA1.2.477525318.1588410875; login_type=WX; csrftoken=rKxNBUhE4k3PgXItU6IDOMwhSm7poG4g; sessionid=a6r7uw4d16ydrb7dwpj8vartm8znaw6c; k=157974; UM_distinctid=171d4c3703780a-09cd4481df16f-c373667-144000-171d4c37038ca2; _log_user_id=879f4df9fa88428caa67e88046538c14; _spoc_lms_cms_sessionid=18cd8a74ead9d82cf7d6fb67100872d1; frontendUserTrack=9046; frontendUserReferrer=http://tsinghua.xuetangx.com/newcloud/dashboard#/mycredit; frontendUserTrackPrev=9046; _gat_gtag_UA_164784773_1=1; django_language=zh"
-
+INDEX_URL = "https://**************************offset={offset}&limit={limit}"
+COOKIE = r"_ga=GA***********************************************************jango_language=zh"
 
 LIMIT = 10
 
