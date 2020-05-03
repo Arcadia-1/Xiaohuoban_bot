@@ -25,8 +25,4 @@
 
 在下面的请求头中可以找到cookie，非常长的一串参数，替换代码中的COOKIE全局变量。注意保留r，因为cookie中含有一些字符可能会有转义问题。
 
-<<<<<<< HEAD
 ![1588490635152](https://github.com/Arcadia-1/Xiaohuoban_bot/blob/master/xuetang_comment_spider/pictures%20for%20readme/3.png)
-=======
-![1588490635152](https://github.com/Arcadia-1/Xiaohuoban_bot/blob/master/xuetang_comment_spider/pictures%20for%20readme/3.png)
->>>>>>> 26b35605026831f3a6c187ea7614d3e28e3183d6
