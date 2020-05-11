@@ -2,9 +2,8 @@
 # export LANG=zh_CN.UTF-8
 
 import smtplib
-import os, time, logging
+import os, time, logging, re, json, csv
 import easygui
-import json
 
 from email.mime.text import MIMEText
 from email import encoders
@@ -32,6 +31,7 @@ def _format_addr(s):
 def load_configuration(config_json):
 
     configuration = json.load(open(config_json, "rb"))
+
     for key in configuration.keys():
         if configuration[key] == None:
             logger.error("Please choose: " + key)
@@ -40,12 +40,11 @@ def load_configuration(config_json):
     return configuration
 
 
-# 设置收件人地址文件、收件人姓名文件、邮件正文欢迎词
+# 设置收件人信息文件、邮件正文欢迎词
 def reconfigure(config_json):
     configuration = {}
-    configuration["address_txt"] = easygui.fileopenbox(msg="选择邮箱地址文件")
-    configuration["name_txt"] = easygui.fileopenbox(msg="选择发送对象姓名文件")
-    configuration["greeting_txt"] = easygui.fileopenbox(msg="选择问候语文件")
+    configuration["info_csv"] = easygui.fileopenbox(msg="选择邮件对象信息文件", default="*.csv")
+    configuration["greeting_txt"] = easygui.fileopenbox(msg="选择问候语文件", default="*.txt")
     configuration["picture_dir"] = easygui.diropenbox(msg="选择图片文件夹")
 
     for key in configuration.keys():
@@ -56,6 +55,27 @@ def reconfigure(config_json):
     json.dump(
         configuration, open(config_json, "w", encoding="utf-8"), ensure_ascii=False
     )
+
+
+def get_mode(data):
+
+    # 读取第几期
+    re_date = re.search("第.期", data).group(0)
+
+    # 早安世界/晚安清华
+    re_morning = re.search("早安世界", data)
+    re_night = re.search("晚安清华", data)
+
+    if re_morning != None:
+        attach_filename = "Certificate_morning.png"
+        re_mode = re_morning.group(0)
+
+    elif re_night != None:
+        attach_filename = "Certificate_night.png"
+        re_mode = re_night.group(0)
+
+    subject = "【小伙伴计划】" + re_mode + "（" + re_date + "）打卡证书"
+    return subject, attach_filename
 
 
 class MailSender(object):
@@ -78,6 +98,7 @@ class MailSender(object):
 
     def prepare_mail(self, name, to_address, picture_file):
         if not os.path.exists(picture_file):
+            logger.error("Picture not found!")
             return -1
         else:
             # 邮件对象:
@@ -103,29 +124,36 @@ class MailSender(object):
             return msg
 
     def group_process(self):
-        address_list = open(self.config["address_txt"], "r", encoding="UTF-8")
-        name_list = open(self.config["name_txt"], "r", encoding="UTF-8")
-        mailmsglt = name_list.readlines()
 
-        i = 0
-        for line in address_list.readlines():
-            to_address = line.strip()
-            name = mailmsglt[i][:-1]
+        name_list = []
+        address_list = []
+
+        with open(self.config["info_csv"], "r") as csvfile:
+            reader = csv.reader(csvfile)
+
+            for row in reader:
+                name_list.append(row[0])
+                address_list.append(row[1])
+
+        assert len(name_list) == len(address_list)
+
+        for i in range(len(name_list)):
+            to_address = address_list[i]
+            name = name_list[i]
             picture_file = os.path.join(self.config["picture_dir"], name + ".jpg")
-
             msg = self.prepare_mail(name, to_address, picture_file)
-            self.send_real_email(to_address, msg)
-            i = i + 1
 
             if msg != -1:
-                info = str(i) + ", " + name + ", " + to_address
+                info = str(i + 1) + ", " + name + ", " + to_address
             else:
                 info = name + " 【未找到】"
-            logger.info(info)
+                exit()
 
-        # 关闭两个txt文件
-        address_list.close()
-        name_list.close()
+            # 发送真正的邮件
+            # self.send_real_email(to_address, msg)
+
+            logger.info(info)
+        logger.info("All mails sent.")
 
     def send_real_email(self, to_address, msg):
         # 登录邮箱
@@ -142,9 +170,6 @@ class MailSender(object):
 
 if __name__ == "__main__":
 
-    subject = "【小伙伴计划】晚安清华（第一期）打卡证书"
-    attach_filename = "Certificate_night.png"
-
     while True:
         config_json = "record.json"
         if not os.path.exists(config_json):
@@ -156,16 +181,16 @@ if __name__ == "__main__":
         with open(configuration["greeting_txt"], "r", encoding="UTF-8") as f:
             greeting = f.read()
 
+        subject, attach_filename = get_mode(greeting)
+
         info = (
             "标题 = "
             + subject
-            + "\n附件名 = "
+            + "\n\n附件名 = "
             + attach_filename
-            + "\n收件人地址文件 = "
-            + get_file_tail("address_txt")
-            + "\n收件人姓名文件 = "
-            + get_file_tail("name_txt")
-            + "\n图片文件夹 = "
+            + "\n\n收件人信息文件 = "
+            + get_file_tail("info_csv")
+            + "\n\n图片文件夹 = "
             + get_file_tail("picture_dir")
             + "\n\n文案： \n"
             + greeting
