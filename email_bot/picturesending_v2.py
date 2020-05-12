@@ -56,7 +56,7 @@ def reconfigure(config_json):
         configuration, open(config_json, "w", encoding="utf-8"), ensure_ascii=False
     )
 
-
+# 从问候语文本中读取“第*期”和“早安清华/晚安清华”
 def get_mode(data):
 
     # 读取第几期
@@ -77,7 +77,7 @@ def get_mode(data):
     subject = "【小伙伴计划】" + re_mode + "（" + re_date + "）打卡证书"
     return subject, attach_filename
 
-
+# 发送邮件
 class MailSender(object):
     # 小伙伴计划公邮
     from_address = "thusada@163.com"
@@ -156,6 +156,7 @@ class MailSender(object):
         logger.info("All mails sent.")
 
     def send_real_email(self, to_address, msg):
+        
         # 登录邮箱
         server = smtplib.SMTP_SSL(self.smtp_host, self.smtp_port)
         server.set_debuglevel(0)
@@ -204,6 +205,9 @@ if __name__ == "__main__":
                 logger.info("reconfigured successfully!")
         else:
             break
+    
+    # 以上是核查发送前的各项信息，确认无误后才发送
+    # 注意MailSender.group_process中的send_real_email语句，建议在发送前先注释掉进行测试
 
     Bot = MailSender(configuration, greeting, subject, attach_filename)
     Bot.group_process()
