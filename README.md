@@ -17,3 +17,7 @@ Automation tools for some tedious work in Xiaohuoban Association.
 4. xuetang_comment_spider
 
 爬取学堂在线慕课评论区的评论并按照发言者分类保存。
+
+5. match_teams
+
+为专注榜单活动而做。首先根据组队报名excel，得到一个队名与成员的映射dict。然后据此分析打卡结果，统计每个队伍的总共打卡时长。
